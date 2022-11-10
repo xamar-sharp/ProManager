@@ -29,7 +29,11 @@ namespace ProManager
             services.AddSingleton<IProjectHint, ProjectHint>();
             services.AddSingleton<ISortManager, SortManager>();
             services.AddSingleton<ITimeManager, TimeManager>();
+            services.AddSingleton<IContentManager, ContentManager>();
+            services.AddSingleton<ITaskNavigator, TaskNavigator>();
             services.AddSingleton<IModelValidator<TaskDto>, TaskDtoValidator>();
+            services.AddSingleton<IModelValidator<TaskCommentDto>, TaskCommentDtoValidator>();
+            services.AddSingleton<IModelValidator<SortDto>, SortDtoValidator>();
             services.AddDbContext<Repository>(opt => opt.UseSqlServer(Configuration.GetConnectionString("default")));
             services.Configure<ConfigurationMap>(Configuration);
         }

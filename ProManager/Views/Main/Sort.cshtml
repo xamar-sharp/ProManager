@@ -1,0 +1,21 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model SortDto
+<form method="post" asp-action="SortTasks" asp-antiforgery="true">
+    <div>
+        <input asp-for="SortByDate" type="checkbox"/>
+        <span>Sort by date (descending)</span>
+    </div>
+    <div>
+        <input asp-for="SortByProjectName" type="checkbox"/>
+        <span>Sort by project name (alphabet ascending)</span>
+    </div>
+    <div>
+        <button type="submit">
+            SORT
+        </button>
+    </div>
+</form>

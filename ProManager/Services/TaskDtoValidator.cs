@@ -5,7 +5,7 @@ namespace ProManager.Services
     {
         public bool IsValid(TaskDto dto)
         {
-            return dto.IsProject ? true : dto.CancelDate != default && dto.CancelDate > dto.StartDate;
+            return dto.IsProject ? true : !string.IsNullOrWhiteSpace(dto.ProjectName) && dto.CancelDate != default && dto.StartDate != default && dto.CancelDate > dto.StartDate;
         }
     }
 }

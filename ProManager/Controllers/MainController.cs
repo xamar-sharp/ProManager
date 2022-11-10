@@ -6,6 +6,7 @@ using ProManager.Models;
 using ProManager.Services;
 using ProManager.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 namespace ProManager.Controllers
 {
     public sealed class MainController : Controller
@@ -15,18 +16,35 @@ namespace ProManager.Controllers
         private readonly TaskDtoValidator _taskValidator;
         private readonly SortDtoValidator _sortValidator;
         private readonly ISortManager _sortManager;
-        public MainController(Repository repos, TaskCommentDtoValidator commentValidator, TaskDtoValidator taskValidator, SortDtoValidator sortValidator, ISortManager sortManager)
+        private readonly ITaskNavigator _navigator;
+        private readonly ConfigurationMap _config;
+        public MainController(Repository repos, TaskCommentDtoValidator commentValidator, TaskDtoValidator taskValidator, SortDtoValidator sortValidator, ISortManager sortManager,ITaskNavigator navigator,IOptions<ConfigurationMap> config)
         {
             _repos = repos;
             _commentValidator = commentValidator;
             _taskValidator = taskValidator;
             _sortValidator = sortValidator;
             _sortManager = sortManager;
+            _navigator = navigator;
+            _config = config.Value;
         }
         [HttpGet]
-        public IActionResult Index(int skipTasks = 0)
+        public IActionResult Index(int skipTasks = 0,bool increase = false)
         {
-            ViewBag.SkippedTasks = skipTasks;
+            if (increase)
+            {
+                _navigator.IncreaseLoadedCount(HttpContext, _config.TakeTaskCount);
+                ViewBag.SkippedTasks = _navigator.TasksLoaded;
+            }
+            else
+            {
+                ViewBag.SkippedTasks = skipTasks;
+            }
+            return View();
+        }
+        [HttpGet]
+        public IActionResult TaskCreating()
+        {
             return View();
         }
         [HttpGet]
@@ -35,24 +53,24 @@ namespace ProManager.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult Edit(string taskName)//НА ЭТОЙ ЖЕ СТРАНИЦЕ СПИСОК С КОММЕНТАРИЯМИ И ФОРМА ДЛЯ СОЗДАНИЯ КОММЕНТА!
+        public async Task<IActionResult> Edit(string taskName)//НА ЭТОЙ ЖЕ СТРАНИЦЕ СПИСОК С КОММЕНТАРИЯМИ И ФОРМА ДЛЯ СОЗДАНИЯ КОММЕНТА!
         {
-            return View(model: _repos.FindTaskByName(taskName));
+            return View(model: await _repos.FindTaskByName(taskName));
         }
         [HttpGet]
-        public IActionResult ReadTask(string taskName)
+        public async Task<IActionResult> ReadTask(string taskName)
         {
-            return View(model: _repos.FindTaskByName(taskName));
+            return View(model: await _repos.FindTaskByName(taskName));
         }
         [HttpGet]
-        public IActionResult ReadComment(Guid id)
+        public async Task<IActionResult> ReadComment(Guid id)
         {
-            return View(model: _repos.FindCommentById(id));
+            return View(model: await _repos.FindCommentById(id));
         }
         [HttpGet]
         public async Task<IActionResult> DropComment(string taskName, Guid id)
         {
-            if (await _repos.DeleteCommentById(id))
+            if (await _repos.DeleteComment(id))
             {
                 await _repos.UpdateTaskState(taskName);
             }
@@ -68,26 +86,31 @@ namespace ProManager.Controllers
                 {
                     if (dto.IsProject)
                     {
-                        if (!await _repos.CreateNewProject(dto.TargetName, dto.StartDate))
+                        if (!await _repos.CreateNewProject(dto.TargetName))
                         {
                             ModelState.AddModelError("", "Database Error!");
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index");
                         }
                     }
                     else
                     {
-                        if (!await _repos.CreateNewTask(dto.TargetName, dto.StartDate, dto.CancelDate))
+                        if (!await _repos.CreateNewTask(dto.ProjectName, dto.TargetName, dto.StartDate, dto.CancelDate))
                         {
                             ModelState.AddModelError("", "Database Error!");
                         }
                         else
                         {
                             await _repos.UpdateProjectState(dto.TargetName);
+                            return RedirectToAction("Index");
                         }
                     }
                 }
                 ModelState.AddModelError("", "Task has invalid struct!");
             }
-            return View("Index", dto);
+            return View("TaskCreating", dto);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -103,7 +126,7 @@ namespace ProManager.Controllers
                     }
                     else
                     {
-                        await _repos.UpdateTaskState(dto.TaskName);//Inner has UpdateProjectState!!!!
+                        await _repos.UpdateTaskState(dto.TaskName);
                     }
                 }
             }

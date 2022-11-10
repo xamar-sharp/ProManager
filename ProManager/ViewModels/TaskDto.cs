@@ -10,8 +10,8 @@ namespace ProManager.ViewModels
         [StringLength(255,MinimumLength =1,ErrorMessage ="Name length should be: > 0 and < 256!")]
         public string TargetName { get; set; }
         public bool IsProject { get; set; }
+        public string ProjectName { get; set; }
         public DateTime CancelDate { get; set; }
-        [Required(ErrorMessage ="This field is required!")]
         public DateTime StartDate { get; set; }
     }
 }

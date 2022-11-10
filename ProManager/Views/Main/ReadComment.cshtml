@@ -1,0 +1,15 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    string unformat = contentManager.Deserialize(Model.Content,Model.CommentType == 1);
+}
+@model TaskComment
+@inject IContentManager contentManager
+
+@if(Model.CommentType == 0){
+    <h1>@unformat</h1>
+}
+else{
+    <img src="data:image/jpeg;base64,@unformat"/>
+}

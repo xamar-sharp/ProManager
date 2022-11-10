@@ -1,5 +1,111 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+	bool isSorted = ViewBag.Sorted is not null;
+	int counter = 1;
+	TimeSpan totalTime = TimeSpan.Zero;
 }
+@inject Repository repos
+@inject IOptions<ConfigurationMap> config
+@inject ITimeManager timeManager
+<div>
+	<form method="get" asp-action="TaskCreating">
+		<button type="submit">
+			NEW
+		</button>
+	</form>
+	<form method="get" asp-action="Sort">
+		<button type="submit">
+			SORT
+		</button>
+	</form>
+</div>
+<div>
+	<table>
+		<tr>
+			<td>
+				Id
+			</td>
+			<td>
+				Amount Time
+			</td>
+			<td>
+				Task
+			</td>
+			<td>
+				Project
+			</td>
+			<td>
+				Start Date
+			</td>
+			<td>
+				End Date
+			</td>
+		</tr>
+		@if (isSorted)
+		{
+			for (var x = 0; x < ViewBag.Sorted.Count; x++, counter++)
+			{
+				var task = ViewBag.Sorted[x];
+				<tr>
+					<td>
+						<a asp-action="Edit" asp-route-task-name="@task.TaskName">@counter</a>
+					</td>
+					<td>
+						@timeManager.GetAmountTime(task)
+					</td>
+					<td>
+						@task.TaskName
+					</td>
+					<td>
+						@task.ProjectName
+					</td>
+					<td>
+						@task.StartDate
+					</td>
+					<td>
+						@task.CancelDate
+					</td>
+				</tr>
+			}
+			totalTime = timeManager.GetTotalTime(ViewBag.Sorted);
+		}
+		else
+		{
+			var tasks = await repos.GetTasks(ViewBag.SkippedTasks, config.Value.TakeTaskCount);
+			for (var x = 0; x < tasks.Count; x++, counter++)
+			{
+				var task = tasks[x];
+				<tr>
+					<td>
+						<a asp-action="ReadTask" asp-route-task-name="@task.TaskName">@counter</a>
+					</td>
+					<td>
+						@timeManager.GetAmountTime(task)
+					</td>
+					<td>
+						@task.TaskName
+					</td>
+					<td>
+						@task.ProjectName
+					</td>
+					<td>
+						@task.StartDate
+					</td>
+					<td>
+						@task.CancelDate
+					</td>
+				</tr>
+			}
+			totalTime = timeManager.GetTotalTime(tasks);
+		}
+	</table>
+</div>
+<div>
+	<h1>Total amout for tasks: @totalTime</h1>
+</div>
+<div>
+	<form method="get" asp-action="Index" asp-route-increase="true" asp-route-skip-tasks="@ViewBag.SkippedTasks">
+		<button type="submit">
+			Load more
+		</button>
+	</form>
+</div>

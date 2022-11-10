@@ -12,7 +12,7 @@ namespace ProManager.Implementations
             {
                 throw new ArgumentNullException();
             }
-            return new Repository(new DbContextOptionsBuilder<Repository>().UseSqlServer(args[0]).Options);
+            return new Repository(new DbContextOptionsBuilder<Repository>().UseSqlServer(args[0]).Options, new ContentManager());
         }
     }
 }

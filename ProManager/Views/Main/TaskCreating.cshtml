@@ -1,0 +1,35 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model TaskDto
+@inject IProjectHint hint
+<div asp-validation-summary="ModelOnly">
+
+</div>
+<form method="post" asp-action="CreateProjectOrTask" asp-antiforgery="true">
+    <div>
+        <input asp-for="TargetName" type="text" placeholder="New project/task name"/>
+    </div>
+    <div>
+        <input asp-for="IsProject" type="checkbox"/>
+        <span>Are you creating Project?</span>
+    </div>
+    @if(!Model.IsProject){
+        <div>
+            @Html.DropDownListFor(ent=>ent.ProjectName,new SelectList(await hint.DisplayAsync()))
+        </div>
+        <div>
+            <input asp-for="StartDate" type="date" placeholder="Start date of task"/>
+        </div>
+        <div>
+            <input asp-for="CancelDate" type="date" placeholder="End date of task"/>
+        </div>
+    }
+    <div>
+        <button type="submit">
+            CREATE
+        </button>
+    </div>
+</form>
