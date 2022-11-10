@@ -10,7 +10,7 @@ namespace ProManager.Services
         {
             if (model.CancelDate == default)
             {
-                return TimeSpan.MaxValue;
+                return TimeSpan.Zero;
             }
             return model.CancelDate - model.StartDate;
         }

@@ -47,7 +47,7 @@
 				var task = ViewBag.Sorted[x];
 				<tr>
 					<td>
-						<a asp-action="Edit" asp-route-task-name="@task.TaskName">@counter</a>
+						<a asp-action="Edit" asp-route-taskName="@task.TaskName">@counter</a>
 					</td>
 					<td>
 						@timeManager.GetAmountTime(task)
@@ -56,7 +56,7 @@
 						@task.TaskName
 					</td>
 					<td>
-						@task.ProjectName
+						@task.Project.ProjectName
 					</td>
 					<td>
 						@task.StartDate
@@ -76,7 +76,7 @@
 				var task = tasks[x];
 				<tr>
 					<td>
-						<a asp-action="ReadTask" asp-route-task-name="@task.TaskName">@counter</a>
+						<a asp-action="Edit" asp-route-taskName="@task.TaskName">@counter</a>
 					</td>
 					<td>
 						@timeManager.GetAmountTime(task)
@@ -85,13 +85,13 @@
 						@task.TaskName
 					</td>
 					<td>
-						@task.ProjectName
+						@task.Project.ProjectName
 					</td>
 					<td>
-						@task.StartDate
+						@task.StartDate.ToString("t")
 					</td>
 					<td>
-						@task.CancelDate
+						@task.CancelDate.ToString("t")
 					</td>
 				</tr>
 			}
@@ -100,10 +100,10 @@
 	</table>
 </div>
 <div>
-	<h1>Total amout for tasks: @totalTime</h1>
+	<h1>Total amount time for tasks: @totalTime</h1>
 </div>
 <div>
-	<form method="get" asp-action="Index" asp-route-increase="true" asp-route-skip-tasks="@ViewBag.SkippedTasks">
+	<form method="get" asp-action="Index" asp-route-increase="true" asp-route-skipTasks="@ViewBag.SkippedTasks">
 		<button type="submit">
 			Load more
 		</button>

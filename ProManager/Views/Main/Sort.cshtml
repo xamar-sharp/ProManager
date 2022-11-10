@@ -4,6 +4,7 @@
 @{
 }
 @model SortDto
+<div asp-validation-summary="ModelOnly"></div>
 <form method="post" asp-action="SortTasks" asp-antiforgery="true">
     <div>
         <input asp-for="SortByDate" type="checkbox"/>

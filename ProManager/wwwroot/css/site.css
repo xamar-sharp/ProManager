@@ -84,8 +84,10 @@ tr {
 td {
     align-content: center;
 }
-table {
+table,th,td {
     margin: 20px;
+    border-collapse: collapse;
+    border: 2px solid black;
 }
 input {
     align-content: center;

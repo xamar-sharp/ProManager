@@ -12,13 +12,13 @@ namespace ProManager.Controllers
     public sealed class MainController : Controller
     {
         private readonly Repository _repos;
-        private readonly TaskCommentDtoValidator _commentValidator;
-        private readonly TaskDtoValidator _taskValidator;
-        private readonly SortDtoValidator _sortValidator;
+        private readonly IModelValidator<TaskCommentDto> _commentValidator;
+        private readonly IModelValidator<TaskDto> _taskValidator;
+        private readonly IModelValidator<SortDto> _sortValidator;
         private readonly ISortManager _sortManager;
         private readonly ITaskNavigator _navigator;
         private readonly ConfigurationMap _config;
-        public MainController(Repository repos, TaskCommentDtoValidator commentValidator, TaskDtoValidator taskValidator, SortDtoValidator sortValidator, ISortManager sortManager,ITaskNavigator navigator,IOptions<ConfigurationMap> config)
+        public MainController(Repository repos, IModelValidator<TaskCommentDto> commentValidator, IModelValidator<TaskDto> taskValidator, IModelValidator<SortDto> sortValidator, ISortManager sortManager,ITaskNavigator navigator,IOptions<ConfigurationMap> config)
         {
             _repos = repos;
             _commentValidator = commentValidator;
@@ -53,7 +53,7 @@ namespace ProManager.Controllers
             return View();
         }
         [HttpGet]
-        public async Task<IActionResult> Edit(string taskName)//НА ЭТОЙ ЖЕ СТРАНИЦЕ СПИСОК С КОММЕНТАРИЯМИ И ФОРМА ДЛЯ СОЗДАНИЯ КОММЕНТА!
+        public async Task<IActionResult> Edit(string taskName)
         {
             return View(model: await _repos.FindTaskByName(taskName));
         }

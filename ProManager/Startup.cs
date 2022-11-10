@@ -26,7 +26,7 @@ namespace ProManager
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddSingleton<IProjectHint, ProjectHint>();
+            services.AddTransient<IProjectHint, ProjectHint>();
             services.AddSingleton<ISortManager, SortManager>();
             services.AddSingleton<ITimeManager, TimeManager>();
             services.AddSingleton<IContentManager, ContentManager>();

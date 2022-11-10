@@ -10,7 +10,7 @@ namespace ProManager.Implementations
         {
             builder.HasData(new Project() { Id = Guid.Parse("1A1A1A1A-1A1A-1A1A-1A1A-1A1A1A1A1A1A"), ProjectName = "Web-Site", CreateAt = DateTime.Now, UpdateAt = DateTime.Now });
             builder.Property(ent => ent.CreateAt).HasDefaultValueSql("'GETDATE()'");
-            builder.Property(ent => ent.UpdateAt).HasDefaultValue("'GETDATE()'");
+            builder.Property(ent => ent.UpdateAt).HasDefaultValueSql("'GETDATE()'");
         }
     }
 }

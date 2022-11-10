@@ -7,9 +7,11 @@
 @inject IContentManager manager
 @inject IProjectHint hint
 <div>
+	<div asp-validation-summary="ModelOnly"></div>
 	<form method="post" asp-action="EditTask" asp-antiforgery="true">
 		<div>
 			<input asp-for="TaskName" type="text" value="@Model.TaskName" placeholder="New project/task name" />
+			<span asp-validation-for="TaskName"></span>
 		</div>
 		<div>
 			<input asp-for="StartDate" type="date" value="@Model.StartDate" placeholder="Start date of task" />
@@ -48,7 +50,7 @@
 				var current = Model.TaskComments.ElementAt(x);
 				@if (current.CommentType == 0)
 				{
-					<a asp-action="DropComment" asp-route-id="@current.Id" asp-route-task-name="@Model.TaskName">
+					<a asp-action="DropComment" asp-route-id="@current.Id" asp-route-taskName="@Model.TaskName">
 						<h1>@manager.Deserialize(current.Content,false)</h1>
 					</a>
 				}
