@@ -9,7 +9,6 @@ namespace ProManager.Implementations
         public void Configure(EntityTypeBuilder<TaskModel> builder)
         {
             builder.HasOne(ent => ent.Project).WithMany(ent => ent.Tasks).HasForeignKey("ProjectId").OnDelete(DeleteBehavior.Cascade);
-            builder.HasOne(ent => ent.TaskComment).WithOne(ent => ent.Task).HasForeignKey<TaskComment>(comment => comment.TaskId).OnDelete(DeleteBehavior.Cascade);
             builder.Property(ent => ent.StartDate).HasDefaultValueSql("'GETDATE()'");
             builder.Property(ent => ent.UpdateDate).HasDefaultValueSql("'GETDATE()'");
             builder.Property(ent => ent.CreateDate).HasDefaultValueSql("'GETDATE()'");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,10 @@ namespace ProManager.Models
         public DateTime UpdateDate { get; set; }
         public Guid ProjectId { get; set; }
         public Project Project { get; set; }
-        public TaskComment TaskComment { get; set; }
+        public ICollection<TaskComment> TaskComments { get; set; }
+        public TaskModel()
+        {
+            TaskComments = new List<TaskComment>(2);
+        }
     }
 }
