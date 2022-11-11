@@ -16,6 +16,10 @@ namespace ProManager.Services
         }
         public TimeSpan GetTotalTime(IEnumerable<TaskModel> models)
         {
+            if(models.Count() == 0)
+            {
+                return TimeSpan.Zero;
+            }
             return models.Select(ent => GetAmountTime(ent)).Aggregate((prev, next) => prev + next);
         }
     }

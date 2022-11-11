@@ -161,14 +161,14 @@ namespace ProManager.Controllers
         {
             if (_sortValidator.IsValid(dto))
             {
-                List<TaskModel> results = new List<TaskModel>(2);
+                List<TaskModel> results = null;
                 if (dto.SortByDate)
                 {
-                    results.AddRange(_sortManager.SortByCreateDate(await _repos.GetAllTasks()));
+                    results = _sortManager.SortByCreateDate(await _repos.GetAllTasks()).ToList();
                 }
                 if (dto.SortByProjectName)
                 {
-                    results.AddRange(_sortManager.SortByProject(await _repos.GetAllTasks()));
+                    results = _sortManager.SortByProject(await _repos.GetAllTasks()).ToList();
                 }
                 ViewBag.Sorted = results;
             }
