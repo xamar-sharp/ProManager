@@ -18,7 +18,7 @@ namespace ProManager.Controllers
         private readonly ISortManager _sortManager;
         private readonly ITaskNavigator _navigator;
         private readonly ConfigurationMap _config;
-        public MainController(Repository repos, IModelValidator<TaskCommentDto> commentValidator, IModelValidator<TaskDto> taskValidator, IModelValidator<SortDto> sortValidator, ISortManager sortManager,ITaskNavigator navigator,IOptions<ConfigurationMap> config)
+        public MainController(Repository repos, IModelValidator<TaskCommentDto> commentValidator, IModelValidator<TaskDto> taskValidator, IModelValidator<SortDto> sortValidator, ISortManager sortManager, ITaskNavigator navigator, IOptions<ConfigurationMap> config)
         {
             _repos = repos;
             _commentValidator = commentValidator;
@@ -29,9 +29,9 @@ namespace ProManager.Controllers
             _config = config.Value;
         }
         [HttpGet]
-        public IActionResult Index(int skipTasks = 0,bool increase = false)
+        public async Task<IActionResult> Index(int skipTasks = 0, bool increase = false)
         {
-            if (increase)
+            if (increase && await _repos.TasksMoreThan(skipTasks))
             {
                 _navigator.IncreaseLoadedCount(HttpContext, _config.TakeTaskCount);
                 ViewBag.SkippedTasks = _navigator.TasksLoaded;
@@ -129,27 +129,31 @@ namespace ProManager.Controllers
                         await _repos.UpdateTaskState(dto.TaskName);
                     }
                 }
+                else
+                {
+                    ModelState.AddModelError("", "Comment has invalid struct!");
+                }
             }
             return RedirectToAction("Edit", new { taskName = dto.TaskName });
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditTask([FromForm] TaskDto dto)//TargetName is IMMUTABLE
+        public async Task<IActionResult> EditTask([FromForm] TaskModel model)
         {
             if (ModelState.IsValid)
             {
-                if (_taskValidator.IsValid(dto))
+                if (_taskValidator.IsValidModel(model))
                 {
-                    if (await _repos.UpdateTask(dto.TargetName, dto.StartDate, dto.CancelDate))
+                    if (await _repos.UpdateTask(model.TaskName, model.StartDate, model.CancelDate))
                     {
-                        await _repos.UpdateProjectState(dto.TargetName);
+                        await _repos.UpdateProjectState(model.TaskName);
                         return RedirectToAction("Index");
                     }
                     ModelState.AddModelError("", "Database Error!");
                 }
-                ModelState.AddModelError("", "Task has invalid struct!");
+                ModelState.AddModelError("", "Invalid time range!");
             }
-            return View("Edit", model: dto);
+            return View("Edit", model: model);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -157,14 +161,14 @@ namespace ProManager.Controllers
         {
             if (_sortValidator.IsValid(dto))
             {
-                IEnumerable<TaskModel> results = new List<TaskModel>(2);
+                List<TaskModel> results = new List<TaskModel>(2);
                 if (dto.SortByDate)
                 {
-                    results.ToList().AddRange(_sortManager.SortByCreateDate(await _repos.GetAllTasks()));
+                    results.AddRange(_sortManager.SortByCreateDate(await _repos.GetAllTasks()));
                 }
                 if (dto.SortByProjectName)
                 {
-                    results.ToList().AddRange(_sortManager.SortByProject(await _repos.GetAllTasks()));
+                    results.AddRange(_sortManager.SortByProject(await _repos.GetAllTasks()));
                 }
                 ViewBag.Sorted = results;
             }

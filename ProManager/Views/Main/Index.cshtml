@@ -1,7 +1,7 @@
 ﻿@{
 	bool isSorted = ViewBag.Sorted is not null;
 	int counter = 1;
-	TimeSpan totalTime = TimeSpan.Zero;
+	string totalTime = TimeSpan.Zero.ToString(@"h\:m");
 }
 @inject Repository repos
 @inject IOptions<ConfigurationMap> config
@@ -50,36 +50,7 @@
 						<a asp-action="Edit" asp-route-taskName="@task.TaskName">@counter</a>
 					</td>
 					<td>
-						@timeManager.GetAmountTime(task)
-					</td>
-					<td>
-						@task.TaskName
-					</td>
-					<td>
-						@task.Project.ProjectName
-					</td>
-					<td>
-						@task.StartDate
-					</td>
-					<td>
-						@task.CancelDate
-					</td>
-				</tr>
-			}
-			totalTime = timeManager.GetTotalTime(ViewBag.Sorted);
-		}
-		else
-		{
-			var tasks = await repos.GetTasks(ViewBag.SkippedTasks, config.Value.TakeTaskCount);
-			for (var x = 0; x < tasks.Count; x++, counter++)
-			{
-				var task = tasks[x];
-				<tr>
-					<td>
-						<a asp-action="Edit" asp-route-taskName="@task.TaskName">@counter</a>
-					</td>
-					<td>
-						@timeManager.GetAmountTime(task)
+						@timeManager.GetAmountTime(task).ToString(@"m\:s")
 					</td>
 					<td>
 						@task.TaskName
@@ -95,15 +66,46 @@
 					</td>
 				</tr>
 			}
-			totalTime = timeManager.GetTotalTime(tasks);
+			totalTime = timeManager.GetTotalTime(ViewBag.Sorted).ToString();
+		}
+		else
+		{
+			var tasks = await repos.GetTasks(ViewBag.SkippedTasks, config.Value.TakeTaskCount);
+			for (var x = 0; x < tasks.Count; x++, counter++)
+			{
+				var task = tasks[x];
+				<tr>
+					<td>
+						<a asp-action="Edit" asp-route-taskName="@task.TaskName">@counter</a>
+					</td>
+					<td>
+						@timeManager.GetAmountTime(task).ToString(@"m\:s")
+					</td>
+					<td>
+						@task.TaskName
+					</td>
+					<td>
+						@task.Project.ProjectName
+					</td>
+					<td>
+						@task.StartDate.ToString("t")
+					</td>
+					<td>
+						@task.CancelDate.ToString("t")
+					</td>
+				</tr>
+			}
+			totalTime = timeManager.GetTotalTime(tasks).ToString();
 		}
 	</table>
 </div>
 <div>
-	<h1>Total amount time for tasks: @totalTime</h1>
+	<h1>Total amount time for tasks @totalTime</h1>
 </div>
 <div>
-	<form method="get" asp-action="Index" asp-route-increase="true" asp-route-skipTasks="@ViewBag.SkippedTasks">
+	<form method="get" asp-controller="Main" asp-action="Index">
+		<input name="increase" type="hidden" value="true" />
+		<input name="skipTasks" type="hidden" value="@ViewBag.SkippedTasks" />
 		<button type="submit">
 			Load more
 		</button>

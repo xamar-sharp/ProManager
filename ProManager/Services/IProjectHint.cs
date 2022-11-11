@@ -7,6 +7,6 @@ namespace ProManager.Services
 {
     public interface IProjectHint
     {
-        Task<IEnumerable<Project>> DisplayAsync();
+        Task<IEnumerable<string>> DisplayAsync();
     }
 }

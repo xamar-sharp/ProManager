@@ -42,7 +42,7 @@ namespace ProManager.Services
         }
         public async Task<bool> UpdateProjectState(string taskName)
         {
-            var project = await Projects.AsNoTracking().Include(ent => ent.Tasks).FirstOrDefaultAsync(ent => ent.Tasks.Any(task => task.TaskName == taskName));
+            var project = await Projects.Include(ent => ent.Tasks).FirstOrDefaultAsync(ent => ent.Tasks.Any(task => task.TaskName == taskName));
             if (project is null)
             {
                 return false;
@@ -50,9 +50,18 @@ namespace ProManager.Services
             project.UpdateAt = DateTime.Now;
             return await TrySaveChangesAsync();
         }
-        public async Task<TaskModel> FindTaskByName(string taskName)
+        public async Task<TaskModel> FindTaskByName(string taskName, bool track = false, bool loadParent = false)
         {
-            return await Tasks.AsNoTracking().Include(ent=>ent.Project).Include(ent=>ent.TaskComments).FirstOrDefaultAsync(ent => ent.TaskName == taskName);
+            var selection = Tasks;
+            if (track)
+            {
+                selection.AsNoTracking();
+            }
+            if (loadParent)
+            {
+                selection.Include(ent => ent.Project);
+            }
+            return await selection.Include(ent => ent.TaskComments).FirstOrDefaultAsync(ent => ent.TaskName == taskName);
         }
         public async Task<TaskComment> FindCommentById(Guid guid)
         {
@@ -60,7 +69,7 @@ namespace ProManager.Services
         }
         public async Task<Project> FindProjectByName(string projectName)
         {
-            return await Projects.AsNoTracking().FirstOrDefaultAsync(ent => ent.ProjectName == projectName);
+            return await Projects.FirstOrDefaultAsync(ent => ent.ProjectName == projectName);
         }
         public async Task<bool> DeleteComment(Guid id)
         {
@@ -135,8 +144,9 @@ namespace ProManager.Services
             task.CancelDate = cancelDate;
             return await TrySaveChangesAsync();
         }
-        public async Task<IList<TaskModel>> GetTasks(int skip, int fetch) => await Tasks.Include(ent => ent.Project).Include(ent => ent.TaskComments).AsNoTracking().Skip(skip).Take(fetch).ToListAsync();
-        public async Task<IList<TaskModel>> GetAllTasks() => await Tasks.Include(ent=>ent.Project).Include(ent=>ent.TaskComments).AsNoTracking().ToListAsync();
+        public async Task<bool> TasksMoreThan(int count) => (await Tasks.CountAsync()) > count;
+        public async Task<IList<TaskModel>> GetTasks(int skip, int fetch) => await Tasks.Include(ent => ent.Project).Include(ent => ent.TaskComments).Skip(skip).Take(fetch).ToListAsync();
+        public async Task<IList<TaskModel>> GetAllTasks() => await Tasks.Include(ent => ent.Project).Include(ent => ent.TaskComments).ToListAsync();
         private async Task<bool> TrySaveChangesAsync()
         {
             try

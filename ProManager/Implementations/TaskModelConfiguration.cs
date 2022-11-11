@@ -12,8 +12,8 @@ namespace ProManager.Implementations
             builder.Property(ent => ent.StartDate).HasDefaultValueSql("'GETDATE()'");
             builder.Property(ent => ent.UpdateDate).HasDefaultValueSql("'GETDATE()'");
             builder.Property(ent => ent.CreateDate).HasDefaultValueSql("'GETDATE()'");
-            builder.HasData(new TaskModel() { Id = Guid.Parse("1A1A1A1A-1A1A-1A1A-1A1A-1A1A1A1A1A1A"), TaskName = "Make Database API", ProjectId = Guid.Parse("1A1A1A1A-1A1A-1A1A-1A1A-1A1A1A1A1A1A"), CreateDate = DateTime.Now, StartDate = DateTime.Now, UpdateDate = DateTime.Now },
-                new TaskModel() { Id = Guid.Parse("2A2A2A2A-2A2A-2A2A-2A2A-2A2A2A2A2A2A"), TaskName = "Select site background-image!", ProjectId = Guid.Parse("1A1A1A1A-1A1A-1A1A-1A1A-1A1A1A1A1A1A"), CreateDate = DateTime.Now, StartDate = DateTime.Now, UpdateDate = DateTime.Now });
+            builder.HasData(new TaskModel() { Id = Guid.Parse("1A1A1A1A-1A1A-1A1A-1A1A-1A1A1A1A1A1A"), TaskName = "Make Database API", ProjectId = Guid.Parse("1A1A1A1A-1A1A-1A1A-1A1A-1A1A1A1A1A1A"), CreateDate = DateTime.Now, StartDate = DateTime.Now, UpdateDate = DateTime.Now, CancelDate=DateTime.Now.AddMinutes(2) },
+                new TaskModel() { Id = Guid.Parse("2A2A2A2A-2A2A-2A2A-2A2A-2A2A2A2A2A2A"), TaskName = "Select site background-image!", ProjectId = Guid.Parse("1A1A1A1A-1A1A-1A1A-1A1A-1A1A1A1A1A1A"), CreateDate = DateTime.Now, StartDate = DateTime.Now, UpdateDate = DateTime.Now, CancelDate= DateTime.Now.AddSeconds(20) });
         }
     }
 }

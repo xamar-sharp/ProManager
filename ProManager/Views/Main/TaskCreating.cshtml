@@ -1,40 +1,47 @@
 ﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+	For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+
 }
 @model TaskDto
 @inject IProjectHint hint
 <div asp-validation-summary="ModelOnly">
-
 </div>
 <form method="post" asp-action="CreateProjectOrTask" asp-antiforgery="true">
-    <div>
-        <input asp-for="TargetName" type="text" placeholder="New project/task name"/>
-        <span asp-validation-for="TargetName"></span>
-    </div>
-    <div>
-        <input asp-for="IsProject" type="checkbox"/>
-        <span>Are you creating Project?</span>
-        <span asp-validation-for="IsProject"></span>
-    </div>
-    @if(!Model.IsProject){
-        <div>
-            @Html.DropDownListFor(ent=>ent.ProjectName,new SelectList(await hint.DisplayAsync()))
-            <span asp-validation-for="ProjectName"></span>
-        </div>
-        <div>
-            <input asp-for="StartDate" type="date" placeholder="Start date of task"/>
-            <span asp-validation-for="StartDate"></span>
-        </div>
-        <div>
-            <input asp-for="CancelDate" type="date" placeholder="End date of task"/>
-            <span asp-validation-for="CancelDate"></span>
-        </div>
-    }
-    <div>
-        <button type="submit">
-            CREATE
-        </button>
-    </div>
+	<div>
+		<input asp-for="TargetName" type="text" placeholder="New project/task name" />
+		<span asp-validation-for="TargetName"></span>
+	</div>
+	<div>
+		<input id="isProject" value="true" asp-for="IsProject" type="checkbox" />
+		<span>Are you creating Project?</span>
+		<span asp-validation-for="IsProject"></span>
+	</div>
+	<div>
+		@Html.DropDownListFor(ent=>ent.ProjectName,new SelectList(await hint.DisplayAsync()),new {id="projectName",disabled="true"})
+		<span asp-validation-for="ProjectName"></span>
+	</div>
+	<div>
+		<input id="startDate" asp-for="StartDate" disabled="true" type="datetime" placeholder="Start date of task" />
+		<span asp-validation-for="StartDate"></span>
+	</div>
+	<div>
+		<input id="cancelDate" disabled="true" disabled="true" asp-for="CancelDate" type="datetime" placeholder="End date of task" />
+		<span asp-validation-for="CancelDate"></span>
+	</div>
+	<div>
+		<button type="submit">
+			CREATE
+		</button>
+	</div>
 </form>
+<script>
+	document.getElementById("isProject").addEventListener('input',displayDynamicInputs);
+	function displayDynamicInputs() {
+		let val = document.getElementById("isProject").checked;
+		document.getElementById("projectName").disabled = !!val;
+		document.getElementById("startDate").disabled = !!val;
+		document.getElementById("cancelDate").disabled = !!val;
+	}
+</script>
